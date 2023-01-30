@@ -22,14 +22,9 @@ function onTextareaInput(evt) {
 }
 
 function populateTextarea() {
-  try {
-    const savedFormData = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (savedFormData) {
-      document.querySelector('textarea').value = savedFormData.message;
-      document.querySelector('input').value = savedFormData.email;
-    }
-  } catch (SyntaxError) {
-    document.querySelector('textarea').value = '';
-    document.querySelector('input').value = '';
+  const savedFormData = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  if (savedFormData) {
+    document.querySelector('textarea').value = savedFormData.message;
+    document.querySelector('input').value = savedFormData.email;
   }
 }
