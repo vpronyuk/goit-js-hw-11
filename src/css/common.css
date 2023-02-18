@@ -61,3 +61,9 @@ img {
 .search-btn:hover {
   fill: white;
 }
+
+#search-results {
+  /* display: flex;
+  gap: 10px;
+  width: calc((100% - 60px) / 3); */
+}
