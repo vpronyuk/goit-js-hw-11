@@ -1,45 +1,44 @@
-// import axios from 'axios';
-// import Notiflix from 'notiflix';
-// import fetchPixabayAPI from './js/script';
-
-// const form = document.getElementById('search-form');
-// console.log('hello');
-
-// form.addEventListener('submit', onSubmit);
-
-// function onSubmit(evt) {
-//   evt.preventDefault();
-
-//   const form = evt.currentTarget;
-//   const inputValue = form.elements.searchQuery.value;
-//   console.log(inputValue);
-//   fetchPixabayAPI(inputValue).then(data => {
-//     console.log(data.json());
-//   });
-// }
-
 import axios from 'axios';
 import Notiflix from 'notiflix';
-// document.cookie = 'cookie_name=cookie_value; SameSite=None';
+import getPixabayPictures from './js/PicturesApiService';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const form = document.getElementById('search-form');
 
-form.addEventListener('submit', handleFormSubmit);
+form.addEventListener('submit', onFormSubmit);
 
-async function handleFormSubmit(event) {
+async function onFormSubmit(event) {
   event.preventDefault();
 
   const form = event.currentTarget;
   const query = form.elements.searchQuery.value.trim();
 
-  const API_KEY = '33618284-b943b6a3bf9edd3f9e88f078b';
-  const BASE_URL = 'https://pixabay.com/api/';
-  const url = `${BASE_URL}?key=${API_KEY}&q=${query}&image_type=photo&orientation=horizontal&safesearch=true&page=1`;
+  // ===========================
+  // getPixabayPictures(query).then(({ hits }) => {
+  //   if (hits.length === 0) throw new Error('No data');
 
+  //   return hits.reduce((markup, hit) => createMarkup(hit) + markup, "");
+  // }).then((markup) => { console.log(markup); })
+  //   .catch(onError)
+  //   .finally(() => form.reset());
+
+  // function createMarkup({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) {
+  //   return `
+  //   <div class="picture-card">
+  //     <img src="${webformatURL}" alt="${alt}">
+  //     <div class="card-info">
+  //     <div class="likes">${likes} likes</div>
+  //     <div class="views">${views} views</div>
+  //     <div class="downloads">${downloads} downloads</div>
+  //   </div>`
+  // }
+
+  // =========================
   try {
-    const response = await axios.get(url);
+    const response = await getPixabayPictures(query);
     const data = response.data;
-
+    // if (data.hits.length === 0) throw new Error('No data!!');
     if (data.hits.length > 0) {
       const images = data.hits.map(hit => {
         return {
@@ -54,8 +53,8 @@ async function handleFormSubmit(event) {
       });
 
       // Clear any previous search results
-      const searchResults = document.getElementById('search-results');
-      searchResults.innerHTML = '';
+
+      picturesWrapper.innerHTML = '';
 
       // Create image cards and add to search results
       images.forEach(image => {
@@ -69,7 +68,7 @@ async function handleFormSubmit(event) {
             <div class="downloads">${image.downloads} downloads</div>
           </div>
         `;
-        searchResults.appendChild(card);
+        picturesWrapper.appendChild(card);
       });
     } else {
       Notiflix.Notify.failure(
@@ -78,6 +77,8 @@ async function handleFormSubmit(event) {
     }
   } catch (error) {
     console.error(error);
+  } finally {
+    form.reset();
   }
-  form.reset();
+  // const lightbox = new SimpleLightbox('picturesWrapper');
 }
