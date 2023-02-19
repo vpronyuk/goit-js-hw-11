@@ -30,15 +30,23 @@ export default class PicturesApiService {
     this.searchQuery = '';
   }
 
-  getPixabayPictures() {
+  async getPixabayPictures() {
     const url = `${BASE_URL}?key=${API_KEY}&q=${this.searchQuery}&${searchParameters}&page=${this.page}&per_page=${this.per_page}`;
 
-    return fetch(url)
-      .then(response => response.json())
-      .then(({ hits }) => {
-        this.nextPage();
-        return hits;
-      });
+    const response = await axios.get(url);
+    this.nextPage();
+    return response.data.hits;
+    // return await fetch(url)
+    //   .then(response => response.json())
+    //   .then(({ hits }) => {
+    //     this.nextPage();
+    //     return hits;
+    //   });
+
+    // return axios.get(url).then(({ hits }) => {
+    //   this.nextPage();
+    //   return hits;
+    // });
   }
 
   nextPage() {
