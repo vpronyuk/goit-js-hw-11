@@ -44,10 +44,12 @@ async function fetchHits() {
   try {
     const hits = await picturesApiService.getPixabayPictures();
 
-    if (hits.length === 0)
+    if (hits.length === 0) {
+      loadMoreBtn.hide();
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
+    }
 
     // throw new Error('No data!!');
     const markup = hits.reduce((markup, hit) => createMarkup(hit) + markup, '');
