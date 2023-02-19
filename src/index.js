@@ -41,16 +41,24 @@ function onFormSubmit(evt) {
 async function fetchHits() {
   loadMoreBtn.disable();
 
+  let totalHits = 0;
+
   try {
     const hits = await picturesApiService.getPixabayPictures();
-
+    totalHits += hits.length;
     if (hits.length === 0) {
       loadMoreBtn.hide();
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
     }
-
+    if (totalHits === 0) {
+      loadMoreBtn.disable();
+      LoadMoreBtn.show();
+      Notiflix.Notify.failure(
+        `We're sorry, but you've reached the end of search results.`
+      );
+    } else Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`);
     // throw new Error('No data!!');
     const markup = hits.reduce((markup, hit) => createMarkup(hit) + markup, '');
     appendPictures(markup);
