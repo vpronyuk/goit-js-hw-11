@@ -1,84 +1,103 @@
-import axios from 'axios';
+// import axios from 'axios';
 import Notiflix from 'notiflix';
-import getPixabayPictures from './js/PicturesApiService';
+import PicturesApiService from './js/PicturesApiService';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+import LoadMoreBtn from './components/LoadMoreBtn.js';
 
 const form = document.getElementById('search-form');
+const picturesWrapper = document.querySelector('.gallery');
 
+const picturesApiService = new PicturesApiService();
+const loadMoreBtn = new LoadMoreBtn({
+  selector: '.load-more',
+  isHidden: true,
+});
+
+const gallery = new SimpleLightbox('.photo-card a', {
+  captionsData: 'alt',
+  captionDelay: 250,
+});
+
+loadMoreBtn.button.addEventListener('click', fetchHits);
+
+// Listener for search button click
 form.addEventListener('submit', onFormSubmit);
 
-async function onFormSubmit(event) {
-  event.preventDefault();
+function onFormSubmit(evt) {
+  evt.preventDefault();
 
-  const form = event.currentTarget;
-  const query = form.elements.searchQuery.value.trim();
+  const form = evt.currentTarget;
+  const inputQuery = form.elements.searchQuery.value.trim();
 
-  // ===========================
-  // getPixabayPictures(query).then(({ hits }) => {
-  //   if (hits.length === 0) throw new Error('No data');
+  picturesApiService.searchQuery = inputQuery;
 
-  //   return hits.reduce((markup, hit) => createMarkup(hit) + markup, "");
-  // }).then((markup) => { console.log(markup); })
-  //   .catch(onError)
-  //   .finally(() => form.reset());
+  picturesApiService.resetPage();
+  clearPictures();
+  loadMoreBtn.show();
+  fetchHits().finally(() => form.reset());
+}
 
-  // function createMarkup({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) {
-  //   return `
-  //   <div class="picture-card">
-  //     <img src="${webformatURL}" alt="${alt}">
-  //     <div class="card-info">
-  //     <div class="likes">${likes} likes</div>
-  //     <div class="views">${views} views</div>
-  //     <div class="downloads">${downloads} downloads</div>
-  //   </div>`
-  // }
+async function fetchHits() {
+  loadMoreBtn.disable();
 
-  // =========================
   try {
-    const response = await getPixabayPictures(query);
-    const data = response.data;
-    // if (data.hits.length === 0) throw new Error('No data!!');
-    if (data.hits.length > 0) {
-      const images = data.hits.map(hit => {
-        return {
-          webformatURL: hit.webformatURL,
-          largeImageURL: hit.largeImageURL,
-          alt: hit.tags,
-          likes: hit.likes,
-          views: hit.views,
-          comments: hit.comments,
-          downloads: hit.downloads,
-        };
-      });
+    const hits = await picturesApiService.getPixabayPictures();
 
-      // Clear any previous search results
-
-      picturesWrapper.innerHTML = '';
-
-      // Create image cards and add to search results
-      images.forEach(image => {
-        const card = document.createElement('div');
-        card.classList.add('card');
-        card.innerHTML = `
-          <img src="${image.webformatURL}" alt="${image.alt}">
-          <div class="card-info">
-            <div class="likes">${image.likes} likes</div>
-            <div class="views">${image.views} views</div>
-            <div class="downloads">${image.downloads} downloads</div>
-          </div>
-        `;
-        picturesWrapper.appendChild(card);
-      });
-    } else {
+    if (hits.length === 0) {
+      loadMoreBtn.hide();
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
     }
+
+    // throw new Error('No data!!');
+    const markup = hits.reduce((markup, hit) => createMarkup(hit) + markup, '');
+    appendPictures(markup);
+    loadMoreBtn.enable();
   } catch (error) {
     console.error(error);
-  } finally {
-    form.reset();
+    // loadMoreBtn.hide();
   }
-  // const lightbox = new SimpleLightbox('picturesWrapper');
+  gallery.refresh();
+  console.log(picturesApiService);
+}
+
+function appendPictures(markup) {
+  picturesWrapper.insertAdjacentHTML('beforeend', markup);
+}
+
+function clearPictures() {
+  picturesWrapper.innerHTML = '';
+}
+
+function createMarkup({
+  webformatURL,
+  largeImageURL,
+  tags,
+  likes,
+  views,
+  comments,
+  downloads,
+}) {
+  return `
+  <div class = "photo-card">
+    <a href="${largeImageURL}"> 
+      <img
+      src="${webformatURL}"
+      alt="${tags}" 
+      loading="lazy"
+      />
+    </a>
+    <div class="info">
+      <p class="info-item">
+        <b>Likes</b>${likes}</p>
+      <p class="info-item">
+        <b>Views</b>${views}</p>
+      <p class="info-item">
+        <b>Comments</b>${comments}</p>
+      <p class="info-item">
+        <b>Downloads</b>${downloads}</p>
+    </div>
+  </div>`;
 }
