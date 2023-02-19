@@ -27,7 +27,7 @@ img {
 }
 
 .search-container {
-  position: fixed;
+  /* position: fixed; */
   background-color: #0a60a5;
   top: 0;
   left: 0;
@@ -81,7 +81,7 @@ img {
 
 .gallery {
   flex: 1 1 auto;
-  position: absolute;
+  /* position: absolute; */
   top: 70px;
   padding: 25px;
   display: flex;
@@ -137,9 +137,10 @@ img {
 .load-more {
   /* position: absolute; */
   /* bottom: auto;
-  left: 0;
-  margin-left: 25px; */
-  /* padding: 10px;
+  left: 0; */
+  margin-left: 25px;
+  margin-bottom: 25px;
+  padding: 10px;
   height: 42px;
   width: 120px;
   border: none;
@@ -152,5 +153,5 @@ img {
 
 .load-more:hover {
   transform: scale(1.2);
-  color: #fafafa; */
+  color: #fafafa;
 }

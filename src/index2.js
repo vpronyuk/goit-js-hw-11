@@ -13,14 +13,16 @@ const loadMoreBtn = new LoadMoreBtn({
   selector: '.load-more',
   isHidden: true,
 });
+
 const gallery = new SimpleLightbox('.photo-card a', {
   captionsData: 'alt',
   captionDelay: 250,
 });
 
+loadMoreBtn.button.addEventListener('click', fetchHits);
+
 // Listener for search button click
 form.addEventListener('submit', onFormSubmit);
-loadMoreBtn.button.addEventListener('click', fetchHits);
 
 function onFormSubmit(evt) {
   evt.preventDefault();
@@ -41,6 +43,7 @@ async function fetchHits() {
 
   try {
     const hits = await picturesApiService.getPixabayPictures();
+
     if (hits.length === 0)
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
@@ -54,6 +57,7 @@ async function fetchHits() {
     console.error(error);
     // loadMoreBtn.hide();
   }
+  gallery.refresh();
   console.log(picturesApiService);
 }
 
