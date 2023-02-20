@@ -109,3 +109,11 @@ function createMarkup({
     </div>
   </div>`;
 }
+
+Notiflix.Notify.init({
+  width: '400px',
+  position: 'center-center',
+  fontSize: '24px',
+  cssAnimationDuration: 300,
+  borderRadius: '10px',
+});
